@@ -4,5 +4,5 @@ import guru.sfg.beer.order.service.domain.BeerOrder;
 
 public interface BeerOrderManager {
 
-    BeerOrder newBeerOrde(BeerOrder beerOrder);
+    BeerOrder newBeerOrder(BeerOrder beerOrder);
 }
