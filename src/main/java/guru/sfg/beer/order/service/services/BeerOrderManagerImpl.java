@@ -16,7 +16,6 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +34,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
     private final StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
     private final BeerOrderRepository beerOrderRepository;
     private final BeerOrderStateChangeInterceptor beerOrderStateChangeInterceptor;
-    private final EntityManager entityManager;
+//    private final EntityManager entityManager;
 
     @Transactional
     @Override
@@ -53,7 +52,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
     public void processValidationResult(UUID beerOrderId, Boolean isValid) {
         log.debug("Process Validation Result for beerOrderId: " + beerOrderId + " Valid? " + isValid);
 
-        entityManager.flush();
+//        entityManager.flush();
 
         Optional<BeerOrder> beerOrderOptional = beerOrderRepository.findById(beerOrderId);
 
@@ -80,7 +79,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
         beerOrderOptional.ifPresentOrElse(beerOrder -> {
             sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_SUCCESS);
-            //awaitForStatus(beerOrder.getId(), BeerOrderStatusEnum.ALLOCATED);
+            awaitForStatus(beerOrder.getId(), BeerOrderStatusEnum.ALLOCATED);
             updateAllocatedQty(beerOrderDto);
         }, () -> log.error("Order Id Not Found: " + beerOrderDto.getId() ));
     }
@@ -91,7 +90,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
         beerOrderOptional.ifPresentOrElse(beerOrder -> {
             sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_NO_INVENTORY);
-//            awaitForStatus(beerOrder.getId(), BeerOrderStatusEnum.PENDING_INVENTORY);
+            awaitForStatus(beerOrder.getId(), BeerOrderStatusEnum.PENDING_INVENTORY);
             updateAllocatedQty(beerOrderDto);
         }, () -> log.error("Order Id Not Found: " + beerOrderDto.getId() ));
 
